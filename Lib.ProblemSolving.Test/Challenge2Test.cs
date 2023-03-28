@@ -26,14 +26,14 @@ public class Challenge2Test
     [Fact]
     public void TestCase4()
     {
-        var value = Challenge2.DiceFacesCalculator(1, 2, 1);
+        var value = Challenge2.DiceFacesCalculator(1, 3, 1);
         Assert.Equal(2, value);
     }
 
     [Fact]
     public void TestCase5()
     {
-        var value = Challenge2.DiceFacesCalculator(3, 6, 3);
+        var value = Challenge2.DiceFacesCalculator(3, 5, 3);
         Assert.Equal(6, value);
     }
 
