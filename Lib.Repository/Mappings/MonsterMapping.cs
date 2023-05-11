@@ -39,12 +39,12 @@ public class MonsterMapping : IEntityTypeConfiguration<Monster>
             new Monster
             {
                 Id = 2,
-                Name = "Red Dragon",
-                Attack = 90,
-                Defense = 80,
-                Hp = 90,
-                Speed = 70,
-                ImageUrl = "https://fsl-assessment-public-files.s3.amazonaws.com/assessment-cc-01/red-dragon.png"
+                Name = "Old Shark",
+                Attack = 50,
+                Defense = 20,
+                Hp = 80,
+                Speed = 90,
+                ImageUrl = "https://fsl-assessment-public-files.s3.amazonaws.com/assessment-cc-01/old-shark.png"
             },
             new Monster
             {
