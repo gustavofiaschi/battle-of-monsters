@@ -190,15 +190,4 @@ public class MonsterControllerTests
         // @TODO missing implementation
     }
 
-    [Fact]
-    public async Task Post_BadRequest_ImportCsv_With_Nonexistent_Monster()
-    {
-        // @TODO missing implementation
-    }
-    
-    [Fact]
-    public async Task Post_BadRequest_ImportCsv_With_Nonexistent_Column()
-    {
-        // @TODO missing implementation
-    }
 }
