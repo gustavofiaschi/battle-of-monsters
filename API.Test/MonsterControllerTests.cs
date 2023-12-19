@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using API.Controllers;
 using API.Test.Fixtures;
 using FluentAssertions;
@@ -28,7 +29,7 @@ public class MonsterControllerTests
             .Setup(x => x.Monsters.GetAllAsync())
             .ReturnsAsync(monsters);
 
-        MonsterController sut = new MonsterController();
+        MonsterController sut = new MonsterController(_repository.Object);
 
         ActionResult result = await sut.GetAll();
         OkObjectResult objectResults = (OkObjectResult) result;
@@ -46,7 +47,7 @@ public class MonsterControllerTests
             .Setup(x => x.Monsters.FindAsync(id))
             .ReturnsAsync(monster);
 
-        MonsterController sut = new MonsterController();
+        MonsterController sut = new MonsterController(_repository.Object);
 
         ActionResult result = await sut.Find(id);
         OkObjectResult objectResults = (OkObjectResult)result;
@@ -62,7 +63,7 @@ public class MonsterControllerTests
             .Setup(x => x.Monsters.FindAsync(id))
             .ReturnsAsync(() => null);
 
-        MonsterController sut = new MonsterController();
+        MonsterController sut = new MonsterController(_repository.Object);
 
         ActionResult result = await sut.Find(id);
         NotFoundObjectResult objectResults = (NotFoundObjectResult)result;
@@ -86,7 +87,7 @@ public class MonsterControllerTests
         this._repository
             .Setup(x => x.Monsters.AddAsync(m));
 
-        MonsterController sut = new MonsterController();
+        MonsterController sut = new MonsterController(_repository.Object);
 
         ActionResult result = await sut.Add(m);
         OkObjectResult objectResults = (OkObjectResult)result;
@@ -111,7 +112,7 @@ public class MonsterControllerTests
         this._repository
            .Setup(x => x.Monsters.Update(id, m));
 
-        MonsterController sut = new MonsterController();
+        MonsterController sut = new MonsterController(_repository.Object);
 
         ActionResult result = await sut.Update(id, m);
         OkResult objectResults = (OkResult)result;
@@ -135,14 +136,13 @@ public class MonsterControllerTests
         this._repository
            .Setup(x => x.Monsters.Update(id, m));
 
-        MonsterController sut = new MonsterController();
+        MonsterController sut = new MonsterController(_repository.Object);
 
         ActionResult result = await sut.Update(id, m);
         NotFoundObjectResult objectResults = (NotFoundObjectResult)result;
         result.Should().BeOfType<NotFoundObjectResult>();
         Assert.Equal($"The monster with ID = {id} not found.", objectResults.Value);
     }
-
 
     [Fact]
     public async Task Delete_OnSuccess_RemoveMonster()
@@ -157,7 +157,7 @@ public class MonsterControllerTests
         this._repository
            .Setup(x => x.Monsters.RemoveAsync(id));
 
-        MonsterController sut = new MonsterController();
+        MonsterController sut = new MonsterController(_repository.Object);
 
         ActionResult result = await sut.Remove(id);
         OkResult objectResults = (OkResult)result;
@@ -176,7 +176,7 @@ public class MonsterControllerTests
         this._repository
            .Setup(x => x.Monsters.RemoveAsync(id));
 
-        MonsterController sut = new MonsterController();
+        MonsterController sut = new MonsterController(_repository.Object);
 
         ActionResult result = await sut.Remove(id);
         NotFoundObjectResult objectResults = (NotFoundObjectResult)result;
@@ -186,8 +186,19 @@ public class MonsterControllerTests
 
     [Fact]
     public async Task Post_OnSuccess_ImportCsvToMonster()
-    {
-        // @TODO missing implementation
+    {        
+        var byteArray = File.ReadAllBytes("../../../Files/monsters-correct.csv");
+        var memoryStream = new MemoryStream(byteArray);
+        var formFile = new FormFile(memoryStream, 0, memoryStream.Length, "Data", "monsters-correct.csv");
+        
+        _repository.Setup(x => x.Monsters.AddAsync(It.IsAny<Monster[]>()));
+
+        MonsterController sut = new MonsterController(_repository.Object);
+                
+        ActionResult result = await sut.ImportCsv(formFile);
+
+        OkResult objectResults = (OkResult)result;
+        result.Should().BeOfType<OkResult>();
     }
 
 }

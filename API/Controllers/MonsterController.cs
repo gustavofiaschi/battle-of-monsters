@@ -11,11 +11,17 @@ public class MonsterController : BaseApiController
 {
     private readonly IBattleOfMonstersRepository _repository;
 
+    public MonsterController(IBattleOfMonstersRepository repository)
+    {
+        this._repository = repository;
+    }
+
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> GetAll()
     {
-        return Ok();
+        IEnumerable<Monster> monsters = await _repository.Monsters.GetAllAsync();
+        return Ok(monsters);
     }
 
     [HttpGet("{id:int}")]
@@ -23,6 +29,10 @@ public class MonsterController : BaseApiController
     public async Task<ActionResult> Find(int id)
     {
         var monster = await _repository.Monsters.FindAsync(id);
+    
+        if (monster == null)
+            return NotFound($"The monster with ID = {id} not found.");
+
         return Ok(monster);
     }
 
@@ -39,6 +49,11 @@ public class MonsterController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> Update(int id, [FromBody] Monster monster)
     {
+        Monster monsterFound = await _repository.Monsters.FindAsync(id);
+
+        if (monsterFound == null)
+            return NotFound($"The monster with ID = {id} not found.");
+
         _repository.Monsters.Update(id, monster);
         await _repository.Save();
         return Ok();
@@ -48,6 +63,11 @@ public class MonsterController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> Remove(int id)
     {
+        Monster monster = await _repository.Monsters.FindAsync(id);
+
+        if (monster == null)
+            return NotFound($"The monster with ID = {id} not found.");
+
         await _repository.Monsters.RemoveAsync(id);
         await _repository.Save();
         return Ok();
@@ -71,7 +91,7 @@ public class MonsterController : BaseApiController
             }
 
             await using (FileStream fs = System.IO.File.Create(filepath))
-            {
+            {                
                 await file.CopyToAsync(fs);
             }
 
@@ -103,7 +123,7 @@ public class MonsterController : BaseApiController
                         System.IO.File.Delete(filepath);
                         return Ok();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         System.IO.File.Delete(filepath);
                         return BadRequest("Wrong data mapping.");
